@@ -8,6 +8,7 @@ On arch linux, you will need the following packages:
 
 - `arm-none-eabi-gcc`, for the compiler itself
 - `arm-none-eabi-newlib`, for the `nano.specs` specification file
+- `arm-none-eabi-gdb`, for debugging
 - `stm32f4-headers-git` (AUR), for the header files
 - `stlink`, for interacting with the chip
 - `openocd`, for debugging the chip
@@ -44,6 +45,13 @@ arm-none-eabi-objcopy -O binary projet.elf projet.bin
    text    data     bss     dec     hex  filename
    4288     112    1584    5984    1760  projet.elf
 ```
+
+Then, run `make flash` to flash the board.
+
+### Debugging
+
+To debug, you will first need to run `make openocd`. This will call `openocd`, which will act as a bridge between `gdb` and the chip.
+Next, run `make gdb` while `make openocd` is running. You should then be able to `continue` the code and see it run.
 
 ## Project structure
 

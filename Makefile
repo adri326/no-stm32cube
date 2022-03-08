@@ -50,7 +50,7 @@ LD = $(PREFIX)-gcc
 OBJCOPY = $(PREFIX)-objcopy
 OBJDUMP = $(PREFIX)-objdump
 SIZE = $(PREFIX)-size
-GDB = gdb
+GDB = $(PREFIX)-gdb
 
 # Debug flags
 ifeq ($(DEBUG),1)
@@ -80,12 +80,17 @@ clean:
 .PHONY: clean
 
 openocd:
-	openocd
+	openocd -f board/st_nucleo_f4.cfg
+# -c "program $(PROJECT).bin verify reset"
 .PHONY: openocd
 
-debug:
-	$(GDB) -ex "target extended-remote localhost:3333"
-.PHONY: debug
+flash:
+	openocd -f board/st_nucleo_f4.cfg -c "program $(PROJECT).elf reset" -c exit
+.PHONY: flash
+
+gdb:
+	$(GDB) -ex "target extended-remote localhost:3333" -ex "monitor reset halt" $(PROJECT).elf
+.PHONY: gdb
 
 $(OBJ):%.o:%.c
 	$(CC) $(CC_FLAGS) $(INCLUDE_PATHS) -c $< -o $@
