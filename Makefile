@@ -54,8 +54,10 @@ GDB = $(PREFIX)-gdb
 
 # Debug flags
 ifeq ($(DEBUG),1)
-	CC_FLAGS += -O0 -g -DDEBUG -DUSE_FULL_ASSERT
+	CC_FLAGS += -O0 -g3 -DDEBUG -DUSE_FULL_ASSERT
 	AS_FLAGS += -gdwarf-2
+else
+	CC_FLAGS += -O3
 endif
 
 # Object files
