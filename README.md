@@ -7,7 +7,7 @@ This project aims to provide a way to create source code for the stm32f4 chips w
 On arch linux, you will need the following packages:
 
 - `arm-none-eabi-gcc`, for the compiler itself
-- `arm-none-eabi-newlib`, for the `nano.specs` specification file
+- `arm-none-eabi-newlib`, for the `nano.specs` specification file, used by the compiler
 - `arm-none-eabi-gdb`, for debugging
 - `stm32f4-headers-git` (AUR), for the header files
 - `stlink`, for interacting with the chip
@@ -15,16 +15,29 @@ On arch linux, you will need the following packages:
 
 ## Installation
 
-First, clone this repository:
+The recommended installation procedure is as follows:
+- clone the repository
+- switch to a new branch (this repository uses the branch name `no-stm32cube`, so it shouldn't interfere with yours)
+- edit the makefile to fit your project
 
 ```sh
 PROJECT_NAME = "my_project"
 git clone https://github.com/adri326/no-stm32cube "${PROJECT_NAME}"
 cd "${PROJECT_NAME}"
 
+git switch -c main
+
 # Edit Makefile and set PROJECT to your PROJECT_NAME
 sed -i "s/PROJECT = project/PROJECT = ${PROJECT_NAME}/" Makefile
 ```
+
+### As a user
+
+If, in the future, you plan on releasing your project, then users of your project will need to do the following:
+- get the required dependencies (for compiling and/or flashing the chip)
+- download the code (through `git clone` or by downloading an archive)
+- compile the code with `make`
+- flash the code with `make flash`
 
 ## Compilation
 
@@ -53,14 +66,20 @@ Then, run `make flash` to flash the board.
 To debug, you will first need to run `make openocd`. This will call `openocd`, which will act as a bridge between `gdb` and the chip.
 Next, run `make gdb` while `make openocd` is running. You should then be able to `continue` the code and see it run.
 
+The `DEBUG` flag in the makefile toggles between a debug build and a release build. It is set to 1 by default.
+If you do change it, then you should re-run the compilation with `make --always-make`, so that it correctly applies the new setting to every file.
+
+When building in debug mode, the macros will be exported in the `.elf` file.
+These will be available in gdb as soon as you have `continue`d the code.
+
 ## Project structure
 
-Pardon how messy this repository is, I'm making my best given the mess that STMicro made available to me.
+Please pardon how messy this repository is, I'm making my best given the mess that STMicro made available to me.
 
 The HAL files for the stm32f4 chip are in `stm32f4/`.
 The makefile compiles all of the `.c` files in this folder by default, but you might want to pick and choose which you need.
 
-The `Makefile` glues all of it together. It is split in several sections.
+The `Makefile` glues everything together; it is split in several sections.
 You should start by modifying the *User section*, then work your way down to the other sections as your needs evolve.
 
 Alternatively, you should be able to easily tweak the Makefile of [jeremyherbert/stm32-templates](https://github.com/jeremyherbert/stm32-templates/tree/master/stm32f4-discovery) to match the structure of this project.
