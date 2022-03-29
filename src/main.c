@@ -4,23 +4,26 @@
 
 // This simple example reads the value of the "user" button on the board and outputs that value to the PC5 led
 
+// Toggles on and off a mask
 void set_mask(volatile uint32_t* target, uint32_t mask, bool state) {
     if (state) *target |= mask;
     else *target &= ~mask;
 }
 
-void set_twobit(volatile uint32_t* target, uint8_t offset_low, uint8_t state) {
-    *target = (*target & ~(0x11 << offset_low)) | state << offset_low;
+// Sets `bits` bits, offsetted `offset_low` to the left, to the value in `state` into `target`
+void set_nbit(volatile uint32_t* target, uint8_t offset_low, uint8_t bits, uint32_t state) {
+    uint32_t mask = ((1 << bits) - 1);
+    *target = (*target & ~(mask << offset_low)) | (state & mask) << offset_low;
 }
 
+#define set_twobit(target, offset_low, state) set_nbit(target, offset_low, 2, state)
+#define set_bit(target, offset_low, state) set_nbit(target, offset_low, 1, state)
+
+// Sets the GPIO mode of a port
 #define MODE_READ 0b00
 #define MODE_WRITE 0b01
 #define MODE_ALTERNATE 0b10
 #define set_mode(gpio, number, state) set_twobit(&gpio->MODER, GPIO_MODER_MODER##number##_Pos, state)
-
-void set_bit(volatile uint32_t* target, uint8_t bit, bool state) {
-    set_mask(target, 1 << bit, state);
-}
 
 bool read_bit(volatile uint32_t* target, uint8_t bit) {
     return (*target >> bit) & 1;
