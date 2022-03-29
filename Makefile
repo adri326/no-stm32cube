@@ -1,7 +1,7 @@
 # === User section ===
 
 # Defines the name of the output binary
-PROJECT = projet
+PROJECT = project
 
 # When set to 1, enables debug flags and disables optimization
 DEBUG = 1
